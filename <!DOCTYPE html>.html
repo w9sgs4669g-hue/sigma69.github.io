@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>石智宇聚餐意願調查表</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+/* ============================================================
+   🎛️ 設計 TOKEN — 想換整體配色就改這裡
+   ============================================================ */
+:root{
+  --bg:        #f6f3ed;   /* 底色：米白 */
+  --card:      #ffffff;
+  --ink:       #1a1a1a;
+  --blue:      #2c1fd1;   /* 「本人自願」按鈕 */
+  --red:       #ff4747;   /* 「不是」按鈕 */
+  --purple:    #5b21b6;   /* 主要行動按鈕（下一步／送出） */
+  --gray:      #9a9a9a;
+  --gray-line: #e4e0d8;
+  --warn:      #e8332b;
+}
+
+*{ box-sizing:border-box; }
+
+html,body{
+  margin:0; padding:0;
+  min-height:100%;
+  background:
+    radial-gradient(circle at 12% 15%, rgba(91,33,182,0.35), transparent 45%),
+    radial-gradient(circle at 88% 20%, rgba(44,31,209,0.3), transparent 40%),
+    radial-gradient(circle at 50% 90%, rgba(255,71,71,0.15), transparent 50%),
+    linear-gradient(180deg, #0d0b16 0%, #15111f 45%, #0a0812 100%);
+  font-family:'Noto Sans TC', sans-serif;
+  color:var(--ink);
+}
+
+/* ---------- 跑馬燈（農場標題風） ---------- */
+.marquee-bar{
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  background:#ffe400;
+  border-bottom:2px solid var(--ink);
+  padding:7px 0;
+  white-space:nowrap;
+}
+.marquee-track{
+  display:inline-block;
+  padding-left:100%;
+  animation:marquee 22s linear infinite;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:0.5px;
+  color:#c81e1e;
+}
+@keyframes marquee{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-100%); }
+}
+
+/* ---------- 版面 ---------- */
+.stage{
+  min-height:calc(100vh - 38px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:32px 16px;
+}
+
+.card{
+  width:100%;
+  max-width:440px;
+  background:var(--card);
+  border-radius:28px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.08);
+  padding:30px 26px 26px;
+}
+
+.step-tag{
+  display:block;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:var(--gray);
+  margin-bottom:10px;
+}
+
+h1.title{
+  font-weight:900;
+  font-size:clamp(22px,6vw,27px);
+  line-height:1.4;
+  margin:0 0 14px;
+}
+
+p.sub{
+  font-size:14px;
+  line-height:1.6;
+  margin:0 0 18px;
+  color:#555;
+}
+
+.screen{ display:none; }
+.screen.active{ display:block; animation:pop-in .3s ease; }
+@keyframes pop-in{
+  from{ opacity:0; transform:translateY(6px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+/* ---------- 圖片佔位框（✏️ 之後把這些換成你自己的迷因圖） ---------- */
+.img-frame{
+  width:100%;
+  aspect-ratio:4/3;
+  border-radius:20px;
+  background:#f1eee6;
+  border:2px dashed var(--gray-line);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin-bottom:18px;
+  font-size:54px;
+}
+.img-frame span.hint{
+  font-size:12px;
+  color:var(--gray);
+  font-weight:500;
+}
+/* 如果換成真實圖片，把 .img-frame 換成： <img class="img-real" src="..."> */
+.img-real{
+  width:100%;
+  border-radius:20px;
+  display:block;
+  margin-bottom:18px;
+  object-fit:cover;
+}
+
+/* ---------- 按鈕 ---------- */
+.btn-row{ display:flex; gap:12px; margin-top:16px; flex-wrap:wrap; }
+.btn{
+  flex:1;
+  min-width:100px;
+  font-family:'Noto Sans TC', sans-serif;
+  font-weight:700;
+  font-size:16px;
+  padding:15px 10px;
+  border:3px solid #000;
+  border-radius:999px;
+  cursor:pointer;
+  color:#fff;
+  transition:transform .12s ease, opacity .12s ease, box-shadow .12s ease;
+}
+.btn:hover{ transform:translateY(-2px); opacity:0.92; }
+.btn:active{ transform:translateY(1px) scale(0.96); }
+.btn.pressed{ animation:btn-press .35s ease; }
+@keyframes btn-press{
+  0%{ transform:scale(1); filter:brightness(1); }
+  35%{ transform:scale(0.88); filter:brightness(1.35); }
+  70%{ transform:scale(1.04); }
+  100%{ transform:scale(1); filter:brightness(1); }
+}
+
+.btn-yes{ background:#fff; color:#000; }
+.btn-no{ background:#fff; color:#000; }
+.btn-yes:hover, .btn-no:hover,
+.btn-yes.pressed, .btn-no.pressed{ background:#ffe400; color:#000; }
+.btn-primary{ background:var(--purple); width:100%; margin-top:16px; }
+.btn-primary:disabled{ opacity:0.4; cursor:not-allowed; transform:none; }
+.btn-link{
+  background:none; border:none; color:var(--gray);
+  text-decoration:underline; font-size:13px; cursor:pointer; padding:6px 0;
+}
+
+/* ---------- 選項（多選 chip） ---------- */
+.option{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:2px solid var(--gray-line);
+  border-radius:14px;
+  padding:12px 14px;
+  margin-bottom:10px;
+  cursor:pointer;
+  background:#fff;
+  font-weight:500;
+  transition:background .15s ease, border-color .15s ease;
+}
+.option.selected{ background:#efe9ff; border-color:var(--purple); }
+.option input{ width:18px; height:18px; accent-color:var(--purple); pointer-events:none; }
+
+.custom-input{
+  width:100%;
+  border:2px solid var(--gray-line);
+  border-radius:14px;
+  background:#fff;
+  padding:12px;
+  font-family:'Noto Sans TC', sans-serif;
+  font-size:14px;
+  margin-top:2px;
+  resize:vertical;
+}
+
+.warn{
+  font-size:12px;
+  color:var(--warn);
+  font-weight:700;
+  margin-top:8px;
+  min-height:16px;
+}
+
+/* ---------- 日曆 ---------- */
+.cal-hint{ font-size:13px; color:#555; margin:0 0 12px; }
+.cal-box{
+  border:2px solid var(--gray-line);
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:16px;
+}
+.cal-nav{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+  font-weight:700;
+  font-size:14px;
+}
+.cal-nav button{
+  border:none; background:#f1eee6; width:30px; height:30px;
+  border-radius:50%; cursor:pointer; font-size:14px; font-weight:700;
+}
+.cal-nav button:disabled{ opacity:0.3; cursor:not-allowed; }
+.cal-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:4px;
+  text-align:center;
+}
+.cal-grid .dow{ font-size:11px; color:var(--gray); font-weight:700; padding-bottom:4px; }
+.cal-day{
+  aspect-ratio:1;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%;
+  font-size:13px;
+  cursor:pointer;
+  background:transparent;
+}
+.cal-day.empty{ cursor:default; }
+.cal-day.disabled{ color:#ccc; cursor:not-allowed; }
+.cal-day.today{ border:1.5px solid var(--purple); }
+.cal-day.selected{ background:var(--purple); color:#fff; font-weight:700; }
+
+.date-panel{
+  border:2px solid var(--gray-line);
+  border-radius:16px;
+  padding:12px 14px;
+  margin-bottom:10px;
+}
+.date-panel-head{
+  display:flex; align-items:center; justify-content:space-between;
+  font-weight:700; font-size:14px; margin-bottom:10px;
+}
+.date-panel-head button{
+  border:none; background:none; color:var(--gray);
+  cursor:pointer; font-size:16px; line-height:1;
+}
+.time-pills{ display:flex; flex-wrap:wrap; gap:8px; }
+.time-pill{
+  border:2px solid var(--gray-line);
+  border-radius:999px;
+  padding:6px 12px;
+  font-size:12.5px;
+  cursor:pointer;
+  background:#fff;
+}
+.time-pill.selected{ background:var(--purple); border-color:var(--purple); color:#fff; }
+
+/* ---------- 確認頁 summary ---------- */
+.summary-box{
+  border:2px solid var(--gray-line);
+  border-radius:16px;
+  background:#faf8f3;
+  padding:14px;
+  margin:14px 0;
+  font-size:13.5px;
+  line-height:1.8;
+}
+.summary-box b{ display:block; margin-bottom:2px; }
+input.name-input{
+  width:100%;
+  border:2px solid var(--gray-line);
+  border-radius:14px;
+  padding:12px 14px;
+  font-family:'Noto Sans TC', sans-serif;
+  font-size:15px;
+  margin-bottom:6px;
+}
+
+.done-emoji{ font-size:56px; text-align:center; margin:10px 0; }
+
+@media (max-width:380px){
+  .btn-row{ flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<div class="marquee-bar">
+  <span class="marquee-track" id="marqueeText">
+    &nbsp;
+  </span>
+</div>
+
+<div class="stage">
+  <div class="card">
+
+    <!-- ============================================================
+         STEP 1：是否願意赴約
+         ✏️ 想改標題文字、按鈕文字，改下面這一段
+         ✏️ 想放照片：把 .img-frame 那個 div 換成
+             <img class="img-real" src="你的圖片網址">
+         ✏️ 按「不是」要導去的網址，在最底下 CONFIG.NO_URL
+       ============================================================ -->
+    <div class="screen active" id="step1">
+      <span class="step-tag">STEP 1 / 5</span>
+      <img class="img-real" src="HE LOST HIS MIND-2.png" alt="迷因圖">
+      <h1 class="title">想不想搞個飯、喝個酒</h1>
+      <p class="sub">Sorry liver, daddy's thirsty again</p>
+      <div class="btn-row">
+        <button class="btn btn-yes" onclick="playSound(CONFIG.SFX.yes); goStep(2)">搞起</button>
+        <button class="btn btn-no" onclick="playSound(CONFIG.SFX.no); location.href=CONFIG.NO_URL">nahhh</button>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         STEP 2：方便時間（日曆式多選）
+         ✏️ 想改可選時段，改最底下 CONFIG.WEEKDAY_TIME_SLOTS / CONFIG.WEEKEND_TIME_SLOTS
+       ============================================================ -->
+    <div class="screen" id="step2">
+      <span class="step-tag">STEP 2 / 5</span>
+      <h1 class="title">你方便的時間</h1>
+      <p class="cal-hint">點日期 → 選當天可以的時間，可以選好幾個不同日期。</p>
+
+      <div class="cal-box">
+        <div class="cal-nav">
+          <button id="calPrev" onclick="changeMonth(-1)">‹</button>
+          <span id="calLabel"></span>
+          <button id="calNext" onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+      <div id="datePanels"></div>
+
+      <div class="warn" id="timeWarn"></div>
+      <div class="btn-row">
+        <button class="btn-link" onclick="goStep(1)">← 上一步</button>
+      </div>
+      <button class="btn btn-primary" onclick="playSound(CONFIG.SFX.next); submitTimes()">我準備好了</button>
+    </div>
+
+    <!-- ============================================================
+         STEP 3：想在哪裡吃（多選）
+         ✏️ 想改地區選項，改最底下 CONFIG.LOCATION_OPTIONS
+       ============================================================ -->
+    <div class="screen" id="step3">
+      <span class="step-tag">STEP 3 / 5</span>
+      <h1 class="title">你想在哪裡吃？</h1>
+      <div id="locationOptions"></div>
+      <div class="warn" id="locationWarn"></div>
+      <div class="btn-row">
+        <button class="btn-link" onclick="goStep(2)">← 上一步</button>
+      </div>
+      <button class="btn btn-primary" onclick="playSound(CONFIG.SFX.next); submitLocation()">下一步</button>
+    </div>
+
+    <!-- ============================================================
+         STEP 4：想搞什麼（多選＋自填）
+         ✏️ 想改菜色選項，改最底下 CONFIG.FOOD_OPTIONS
+       ============================================================ -->
+    <div class="screen" id="step4">
+      <span class="step-tag">STEP 4 / 5　想搞什麼</span>
+      <h1 class="title">你想吃什麼？</h1>
+      <p class="sub">可複選。或想吃什麼可以在下方欄位提出，也可以給出確切地點，譬如麥當勞八德中華店。</p>
+      <div id="foodOptions"></div>
+      <textarea class="custom-input" id="customFood" rows="2" placeholder="其他想吃的東西／確切地點（自由填寫）"></textarea>
+      <div class="warn" id="foodWarn"></div>
+      <div class="btn-row">
+        <button class="btn-link" onclick="goStep(3)">← 上一步</button>
+      </div>
+      <button class="btn btn-primary" onclick="playSound(CONFIG.SFX.next); submitFood()">下一步</button>
+    </div>
+
+    <!-- ============================================================
+         STEP 5：確認資料並送出
+       ============================================================ -->
+    <div class="screen" id="step5">
+      <span class="step-tag">STEP 5 / 5</span>
+      <h1 class="title">最後，你是誰？</h1>
+      <input type="text" class="name-input" id="userName" placeholder="請輸入你的名字／暱稱">
+      <input type="text" class="name-input" id="userContact" placeholder="請輸入你的 Email 或 Line ID">
+      <div class="summary-box" id="summaryBox"></div>
+      <div class="warn" id="finalWarn"></div>
+      <div class="btn-row">
+        <button class="btn-link" onclick="goStep(4)">← 上一步</button>
+      </div>
+      <button class="btn btn-primary" id="submitBtn" onclick="playSound(CONFIG.SFX.submit); finalSubmit()">送出報名</button>
+    </div>
+
+    <!-- 完成頁 -->
+    <div class="screen" id="stepDone">
+      <div class="done-emoji">✅</div>
+      <h1 class="title" style="text-align:center;">案件已受理</h1>
+      <p class="sub" style="text-align:center;">石智宇已收到通知，將在3-4個工作日給您回覆，沒回覆就是喝醉忘記了，你再提醒我一下。</p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   🎛️ CONFIG — 之後要改文字/連結/選項，大部分改這裡就好
+   ============================================================ */
+const CONFIG = {
+  // 按「不是」要導去的 YouTube 網址
+  NO_URL: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+
+  // 👉 Google Apps Script 網址：照對話裡的部署步驟做完後，
+  //    會拿到一串 https://script.google.com/macros/s/xxxx/exec 的網址，
+  //    把它貼到下面雙引號中間（取代 PASTE_YOUR_GOOGLE_APPS_SCRIPT_URL_HERE）
+  GAS_URL: "https://script.google.com/macros/s/AKfycbxKUBQwqNUMR5iYZwC_MOdFc0fCYrK4fMxsogbqlj5JHT6-QHxA0VqQguJt4Y_CgkFn/exec",
+
+  // 🔊 按鈕音效：把 mp3 檔案跟這個 html 放在同一個資料夾，
+  //    再把檔名填進對應欄位；留空字串 "" 就是不播放
+  SFX: {
+    yes: "funny-laugh-sound-effect-background-music.wav",    // 按「本人自願」的音效，例如 "yes.mp3"
+    no: "clash-royale-intro-sound-effect.wav",     // 按「不是」的音效
+    next: "",   // 按「我準備好了」「下一步」的音效
+    submit: ""  // 按「送出報名」的音效
+  },
+
+  // 跑馬燈輪播文字，可自由增減／改成別的農場標題
+  MARQUEE_ITEMS: [
+    "太誇張，與石智宇吃完飯後，他們都指出一個恐怖的真相",
+    "全網瘋傳，所有人都在轉發",
+    "不敢相信！！！83億人與石智宇喝完酒後震驚，身體竟發生這一改變....."
+  ],
+
+  // 假日（六、日）可以選的時段，可自由增減
+  WEEKEND_TIME_SLOTS: [
+    "09:00","10:00","11:00","12:00","13:00","14:00",
+    "15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00"
+  ],
+
+  // 平日（一～五）可以選的時段，可自由增減
+  WEEKDAY_TIME_SLOTS: [
+    "17:00","18:00","19:00"
+  ],
+
+  // 想在哪裡吃的選項，可自由增減
+  LOCATION_OPTIONS: [
+    "台北","新北","桃園"
+  ],
+
+  // 這幾天會被鎖住，不能選
+  BLOCKED_DATES: [
+    "2026-07-21",
+    "2026-07-29",
+    "2026-07-31",
+    "2026-08-08",
+    "2026-08-09"
+  ],
+
+  // 想吃什麼選項，可自由增減
+  FOOD_OPTIONS: [
+    "火鍋","燒烤","純粹跟石智宇在路邊爆喝","日式料理",
+    "熱炒","吃到飽"
+  ]
+};
+
+// 播放按鈕音效用的小工具，找不到檔案或瀏覽器擋自動播放都不會噴錯
+function playSound(src){
+  if(!src) return;
+  try{
+    new Audio(src).play().catch(()=>{});
+  }catch(err){}
+}
+
+// 幫所有 .btn 按鈕加上「按下去」的動畫效果
+document.querySelectorAll(".btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    btn.classList.remove("pressed");
+    void btn.offsetWidth; // 強制重新計算，動畫才能重複觸發
+    btn.classList.add("pressed");
+  });
+});
+
+/* ============================================================
+   跑馬燈：把 CONFIG.MARQUEE_ITEMS 串起來輪播
+   ============================================================ */
+document.getElementById("marqueeText").textContent =
+  CONFIG.MARQUEE_ITEMS.join("　🔥　") + "　🔥　";
+
+/* ============================================================
+   畫面切換
+   ============================================================ */
+function goStep(n){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("step"+n).classList.add("active");
+}
+
+/* ============================================================
+   STEP 3：想吃什麼
+   ============================================================ */
+const state = { locations:new Set(), foods:new Set(), customFood:"", name:"", contact:"" };
+
+function renderLocationOptions(){
+  const el = document.getElementById("locationOptions");
+  el.innerHTML = "";
+  CONFIG.LOCATION_OPTIONS.forEach(opt=>{
+    const row = document.createElement("div");
+    row.className = "option";
+    row.innerHTML = `<input type="checkbox"><span>${opt}</span>`;
+    row.addEventListener("click", ()=>{
+      row.classList.toggle("selected");
+      row.querySelector("input").checked = row.classList.contains("selected");
+      if(state.locations.has(opt)) state.locations.delete(opt); else state.locations.add(opt);
+    });
+    el.appendChild(row);
+  });
+}
+renderLocationOptions();
+
+function submitLocation(){
+  const warn = document.getElementById("locationWarn");
+  if(state.locations.size === 0){
+    warn.textContent = "還是你要跟我在google meet 5G 聚餐？";
+    return;
+  }
+  warn.textContent = "";
+  goStep(4);
+}
+
+function renderFoodOptions(){
+  const el = document.getElementById("foodOptions");
+  el.innerHTML = "";
+  CONFIG.FOOD_OPTIONS.forEach(opt=>{
+    const row = document.createElement("div");
+    row.className = "option";
+    row.innerHTML = `<input type="checkbox"><span>${opt}</span>`;
+    row.addEventListener("click", ()=>{
+      row.classList.toggle("selected");
+      row.querySelector("input").checked = row.classList.contains("selected");
+      if(state.foods.has(opt)) state.foods.delete(opt); else state.foods.add(opt);
+    });
+    el.appendChild(row);
+  });
+}
+renderFoodOptions();
+
+function submitFood(){
+  const warn = document.getElementById("foodWarn");
+  state.customFood = document.getElementById("customFood").value.trim();
+  if(state.foods.size === 0 && state.customFood === ""){
+    warn.textContent = "你不要那麼反社會好不好，選一個啦";
+    return;
+  }
+  warn.textContent = "";
+  buildSummary();
+  goStep(5);
+}
+
+/* ============================================================
+   STEP 2：日曆式時間選擇
+   ============================================================ */
+const WEEKDAYS = ["日","一","二","三","四","五","六"];
+const today = new Date();
+today.setHours(0,0,0,0);
+
+let calYear = today.getFullYear();
+let calMonth = today.getMonth(); // 0-indexed
+
+// key: "YYYY-MM-DD" -> Set of "HH:MM"
+const selectedTimes = new Map();
+
+function dateKey(y,m,d){
+  return `${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+}
+
+function isDateBlocked(key){
+  return CONFIG.BLOCKED_DATES.includes(key);
+}
+
+function renderCalendar(){
+  document.getElementById("calLabel").textContent = `${calYear}年 ${calMonth+1}月`;
+
+  const isCurrentMonth = (calYear === today.getFullYear() && calMonth === today.getMonth());
+  document.getElementById("calPrev").disabled = isCurrentMonth;
+
+  const grid = document.getElementById("calGrid");
+  grid.innerHTML = "";
+  WEEKDAYS.forEach(d=>{
+    const el = document.createElement("div");
+    el.className = "dow";
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDow = new Date(calYear, calMonth, 1).getDay();
+  const totalDays = new Date(calYear, calMonth+1, 0).getDate();
+
+  for(let i=0;i<firstDow;i++){
+    const el = document.createElement("div");
+    el.className = "cal-day empty";
+    grid.appendChild(el);
+  }
+
+  for(let d=1; d<=totalDays; d++){
+    const el = document.createElement("div");
+    const thisDate = new Date(calYear, calMonth, d);
+    const key = dateKey(calYear, calMonth, d);
+    el.className = "cal-day";
+    el.textContent = d;
+
+    if(thisDate < today || isDateBlocked(key)){
+      el.classList.add("disabled");
+    } else {
+      if(thisDate.getTime() === today.getTime()) el.classList.add("today");
+      if(selectedTimes.has(key)) el.classList.add("selected");
+      el.addEventListener("click", ()=>toggleDate(key));
+    }
+    grid.appendChild(el);
+  }
+}
+
+function changeMonth(delta){
+  calMonth += delta;
+  if(calMonth < 0){ calMonth = 11; calYear--; }
+  if(calMonth > 11){ calMonth = 0; calYear++; }
+  renderCalendar();
+}
+
+function toggleDate(key){
+  if(isDateBlocked(key)) return;
+  if(selectedTimes.has(key)) selectedTimes.delete(key);
+  else selectedTimes.set(key, new Set());
+  renderCalendar();
+  renderDatePanels();
+}
+
+function formatDateLabel(key){
+  const [y,m,d] = key.split("-").map(Number);
+  const dt = new Date(y, m-1, d);
+  return `${m}/${d}（${WEEKDAYS[dt.getDay()]}）`;
+}
+
+// 平日只開放 CONFIG.WEEKDAY_TIME_SLOTS，六、日開放 CONFIG.WEEKEND_TIME_SLOTS
+function getTimeSlotsForDate(key){
+  const [y,m,d] = key.split("-").map(Number);
+  const dow = new Date(y, m-1, d).getDay();
+  return (dow === 0 || dow === 6) ? CONFIG.WEEKEND_TIME_SLOTS : CONFIG.WEEKDAY_TIME_SLOTS;
+}
+
+function renderDatePanels(){
+  const container = document.getElementById("datePanels");
+  container.innerHTML = "";
+  const keys = [...selectedTimes.keys()].sort();
+
+  keys.forEach(key=>{
+    const panel = document.createElement("div");
+    panel.className = "date-panel";
+
+    const head = document.createElement("div");
+    head.className = "date-panel-head";
+    head.innerHTML = `<span>${formatDateLabel(key)}</span>`;
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "✕";
+    removeBtn.addEventListener("click", ()=>toggleDate(key));
+    head.appendChild(removeBtn);
+    panel.appendChild(head);
+
+    const pillsWrap = document.createElement("div");
+    pillsWrap.className = "time-pills";
+    getTimeSlotsForDate(key).forEach(t=>{
+      const pill = document.createElement("div");
+      pill.className = "time-pill";
+      pill.textContent = t;
+      if(selectedTimes.get(key).has(t)) pill.classList.add("selected");
+      pill.addEventListener("click", ()=>{
+        const set = selectedTimes.get(key);
+        if(set.has(t)) set.delete(t); else set.add(t);
+        pill.classList.toggle("selected");
+      });
+      pillsWrap.appendChild(pill);
+    });
+    panel.appendChild(pillsWrap);
+
+    container.appendChild(panel);
+  });
+}
+
+renderCalendar();
+renderDatePanels();
+
+function submitTimes(){
+  const warn = document.getElementById("timeWarn");
+  let totalTimes = 0;
+  selectedTimes.forEach(set => totalTimes += set.size);
+  if(totalTimes === 0){
+    warn.textContent = "不是啊，你要我通靈是不是";
+    return;
+  }
+  warn.textContent = "";
+  goStep(3);
+}
+
+/* ============================================================
+   STEP 4：確認並送出
+   ============================================================ */
+function buildSummary(){
+  const box = document.getElementById("summaryBox");
+  const keys = [...selectedTimes.keys()].sort().filter(k => selectedTimes.get(k).size > 0);
+  const timeLines = keys.map(k => `${formatDateLabel(k)}：${[...selectedTimes.get(k)].sort().join("、")}`);
+
+  box.innerHTML = `
+    <b>方便時間</b>${timeLines.length ? timeLines.join("<br>") : "（無）"}
+    <br><br>
+    <b>想在哪裡吃</b>${[...state.locations].join("、") || "（無）"}
+    <br><br>
+    <b>想吃</b>${[...state.foods].join("、") || "（無）"}
+    <br><br>
+    <b>特別想吃</b>${state.customFood || "（無）"}
+  `;
+}
+
+function finalSubmit(){
+  const warn = document.getElementById("finalWarn");
+  state.name = document.getElementById("userName").value.trim();
+  state.contact = document.getElementById("userContact").value.trim();
+  if(state.name === ""){
+    warn.textContent = "⚠️ 請輸入名字，不然不知道是誰要來";
+    return;
+  }
+  if(state.contact === ""){
+    warn.textContent = "我不會拿你的資料去做詐騙，可以放心填";
+    return;
+  }
+  warn.textContent = "";
+
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.textContent = "傳送中...";
+
+  const keys = [...selectedTimes.keys()].sort().filter(k => selectedTimes.get(k).size > 0);
+  const payload = {
+    name: state.name,
+    contact: state.contact,
+    dates: keys.map(k => ({ date:k, times:[...selectedTimes.get(k)].sort() })),
+    locations: [...state.locations],
+    foods: [...state.foods],
+    customFood: state.customFood,
+    submittedAt: new Date().toISOString()
+  };
+
+  if(CONFIG.GAS_URL.startsWith("PASTE_")){
+    console.warn("尚未設定 CONFIG.GAS_URL，資料不會真的被送出，僅顯示畫面效果。");
+    setTimeout(()=>goStep("Done"), 500);
+    return;
+  }
+
+  fetch(CONFIG.GAS_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify(payload)
+  }).then(()=>{
+    goStep("Done");
+  }).catch((err)=>{
+    console.error("傳送失敗，詳細錯誤：", err);
+    btn.disabled = false;
+    btn.textContent = "送出報名";
+    warn.textContent = "⚠️ 傳送失敗，檢查網路後再試一次";
+  });
+}
+</script>
+</body>
+</html>
